@@ -1,4 +1,4 @@
-🇺🇸 [English](https://github.com/palmcivetcn/CheatengineSidebar/blob/main/README_EN.md) | 🇨🇳 [中文]()
+🇺🇸 [English](https://github.com/palmcivetcn/CheatengineSidebar/blob/main/README_EN.md) | 🇨🇳 [中文](https://github.com/palmcivetcn/CheatengineSidebar/blob/main/README.md)
 
 # CE Sidebar Dock (Cheat Engine 7.6 plugin)
 
