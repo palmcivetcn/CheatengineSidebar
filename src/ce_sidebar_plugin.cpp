@@ -2,7 +2,7 @@
 #include "cepluginsdk.h"
 
 // Plugin name/version metadata
-static const char* kPluginName = "CE Sidebar Dock v1.0.3";
+static const char* kPluginName = "CE Sidebar Dock v1.0.4";
 
 static PExportedFunctions g_exports = nullptr;
 static int g_pluginId = 0;
@@ -34,10 +34,10 @@ listBox.Align = "alClient"
 
 local pinBtn = createButton(dockForm)
 pinBtn.Caption = "v" -- down = not pinned; up = pinned
-pinBtn.Width = 24
-pinBtn.Height = 18
+pinBtn.Width = 20
+pinBtn.Height = 16
 pinBtn.Top = 4
-pinBtn.Left = dockForm.Width - pinBtn.Width - 36
+pinBtn.Left = dockForm.Width - pinBtn.Width - 12
 
 local popup = createPopupMenu(dockForm)
 local miRename = createMenuItem(popup)
@@ -151,6 +151,29 @@ end
 miRename.OnClick = doRename
 miClose.OnClick = doClose
 
+local function updatePinPos()
+    if not alive(listBox) or not pinBtn then return end
+    local itemH = listBox.ItemHeight or 18
+    local idx = -1
+    local sidebarKey = keyOf(dockForm)
+    for i,entry in ipairs(windowCache) do
+        if entry.key == sidebarKey or entry.handle == dockForm or entry.name == dockForm.Caption then
+            idx = i-1 -- zero-based row for positioning
+            break
+        end
+    end
+    if idx < 0 then idx = 0 end
+
+    -- size the pin to roughly match row height
+    local btnH = math.max(14, itemH - 4)
+    local btnW = math.max(12, btnH - 2)
+    pinBtn.Height = btnH
+    pinBtn.Width = btnW
+
+    pinBtn.Left = listBox.Left + listBox.Width - pinBtn.Width - 2
+    pinBtn.Top = listBox.Top + idx * itemH + math.floor((itemH - pinBtn.Height)/2)
+end
+
 local function applyTopmost()
     if ce_sidebar_set_topmost then
         ce_sidebar_set_topmost(dockForm.Handle, pinned)
@@ -186,6 +209,7 @@ function refreshList()
     end
 
     lastSnapshot = snapshot()
+    updatePinPos()
 end
 
 -- 用 OnMouseUp 触发切换
@@ -197,6 +221,7 @@ listBox.OnMouseUp = function(sender, button, shift, x, y)
             windowCache[idx].handle:SetFocus()
         end
     end
+    updatePinPos()
 end
 
 -- 初始化显示
@@ -209,14 +234,14 @@ end
 pinBtn.OnClick = function()
     pinned = not pinned
     applyTopmost()
+    updatePinPos()
 end
 
 -- keep pin button at top-right on resize
 local prevOnResize = dockForm.OnResize
 local function adjustPin()
     if pinBtn then
-        pinBtn.Left = dockForm.Width - pinBtn.Width - 36
-        pinBtn.Top = 4
+        updatePinPos()
     end
 end
 adjustPin()
@@ -247,6 +272,7 @@ checker.OnTimer = function()
     if hasChanged(lastSnapshot, snap2) then
         refreshList()
     end
+    updatePinPos()
 end
 
 dockForm.OnClose = function(sender)
