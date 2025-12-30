@@ -2,7 +2,7 @@
 #include "cepluginsdk.h"
 
 // Plugin name/version metadata
-static const char* kPluginName = "CE Sidebar Dock v1.0.2";
+static const char* kPluginName = "CE Sidebar Dock v1.0.3";
 
 static PExportedFunctions g_exports = nullptr;
 static int g_pluginId = 0;
@@ -20,6 +20,8 @@ local windowCache = {}
 local customNames = {} -- handle-string => custom title
 local lastSnapshot = {}
 
+local refreshList -- forward declaration
+
 -- 创建侧边栏
 local dockForm = createForm(true)
 dockForm.Caption = "CE 侧边栏"
@@ -29,6 +31,13 @@ dockForm.BorderStyle = "bsSingle"
 
 local listBox = createListBox(dockForm)
 listBox.Align = "alClient"
+
+local pinBtn = createButton(dockForm)
+pinBtn.Caption = "v" -- down = not pinned; up = pinned
+pinBtn.Width = 24
+pinBtn.Height = 18
+pinBtn.Top = 4
+pinBtn.Left = dockForm.Width - pinBtn.Width - 36
 
 local popup = createPopupMenu(dockForm)
 local miRename = createMenuItem(popup)
@@ -142,7 +151,17 @@ end
 miRename.OnClick = doRename
 miClose.OnClick = doClose
 
-local function refreshList()
+local function applyTopmost()
+    if ce_sidebar_set_topmost then
+        ce_sidebar_set_topmost(dockForm.Handle, pinned)
+    end
+    if pinBtn then
+        pinBtn.Caption = pinned and "^" or "v"
+        pinBtn.Hint = pinned and "取消置顶" or "置顶"
+    end
+end
+
+function refreshList()
     if not alive(listBox) then return end
     listBox.Items.Clear()
     windowCache = {}
@@ -186,10 +205,27 @@ dockForm:Show()
 if ce_sidebar_make_appwindow then
     ce_sidebar_make_appwindow(dockForm.Handle)
 end
--- 设置置顶，避免被其他 CE 窗口遮挡；需要时可改为 false
-if ce_sidebar_set_topmost then
-    ce_sidebar_set_topmost(dockForm.Handle, true)
+
+pinBtn.OnClick = function()
+    pinned = not pinned
+    applyTopmost()
 end
+
+-- keep pin button at top-right on resize
+local prevOnResize = dockForm.OnResize
+local function adjustPin()
+    if pinBtn then
+        pinBtn.Left = dockForm.Width - pinBtn.Width - 36
+        pinBtn.Top = 4
+    end
+end
+adjustPin()
+dockForm.OnResize = function(sender)
+    adjustPin()
+    if prevOnResize then prevOnResize(sender) end
+end
+
+applyTopmost()
 refreshList()
 reposition()
 
@@ -216,6 +252,7 @@ end
 dockForm.OnClose = function(sender)
     if checker then checker.Enabled = false end
     listBox = nil
+    pinBtn = nil
     dockForm = nil
     customNames = {}
 end
