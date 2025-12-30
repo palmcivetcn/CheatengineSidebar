@@ -14,13 +14,13 @@ https://github.com/user-attachments/assets/2f89748d-c55d-4219-aa8c-5f89030f22b2
 
 ## 使用
 1. 将relase的ce_sidebar_plugin.dll下载
-2.复制到ce根目录\plugins下即可
-3.打开ce修改器，点击编辑->设置->插件->添加新项
+2. 复制到ce根目录\plugins下即可
+3. 打开ce修改器，点击编辑->设置->插件->添加新项
 <img width="692" height="584" alt="image" src="https://github.com/user-attachments/assets/03f638b1-53dd-4e5b-9849-563ce06f4aa6" />
 
-4.找到你刚才复制好的文件，随后确定
-5.千万**别忘了**去勾选上并点击下方的确定哦
-6.重启ce，开心食用吧！
+4. 找到你刚才复制好的文件，随后确定
+5. 千万**别忘了**去勾选上并点击下方的确定哦
+6. 重启ce，开心食用吧！
 
 ## 注意事项
 - 仅针对 CE 7.6 API 编写；其他版本接口可能不同。
