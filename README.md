@@ -40,5 +40,4 @@ https://github.com/user-attachments/assets/2f89748d-c55d-4219-aa8c-5f89030f22b2
 - 仅针对 CE 7.6 API 编写；其他版本接口可能不同。
 - 插件通过 WinAPI 去除窗口所有者并添加 `WS_EX_APPWINDOW`，如遇特殊皮肤或多显示器异常，可尝试在 Lua 中调整 `xOffset/yOffset` 或在 C++ 中去掉 `WS_OVERLAPPEDWINDOW` 设置。
 - 卸载：从 `plugins` 目录移除 DLL，重启 CE。
-
-迭代版本 v1.0.0 + 初始发布
+还有点小bug，欢迎大家提pr和issue，或者是其他的建议，有时间会更新，提pr会审。实际作用源代码在src里面，文件有点小乱
