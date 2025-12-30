@@ -1,3 +1,5 @@
+🇺🇸 [English](https://github.com/palmcivetcn/CheatengineSidebar/blob/main/README_EN.md) | 🇨🇳 [中文]()
+
 # CE Sidebar Dock (Cheat Engine 7.6 plugin)
 
 一个侧边栏显示当前CE显示所有页面并支持点击切换的 CE 插件（可被windows识别为独立窗口，方便切换使用）
