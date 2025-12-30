@@ -2,8 +2,7 @@
 
 一个把你现有的 Lua 侧边栏脚本包装成真正 Windows 顶层窗口的 CE 插件（v1.0.0）。
 ## 实机演示
-
-
+https://github.com/user-attachments/assets/2f89748d-c55d-4219-aa8c-5f89030f22b2
 ## 功能
 - 自动隐藏默认的“CE 窗口列表”菜单项，使用精简标题显示 CE 侧边窗口。
 - 通过插件层把 Lua 表单提升为 Windows 顶层窗口（`WS_EX_APPWINDOW`），支持 Alt+Tab、多窗口切换。
