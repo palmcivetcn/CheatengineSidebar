@@ -458,9 +458,9 @@ typedef struct _ExportedFunctions
 } ExportedFunctions, *PExportedFunctions;
 
 
-BOOL __stdcall CEPlugin_GetVersion(PPluginVersion pv , int sizeofpluginversion);
-BOOL __stdcall CEPlugin_InitializePlugin(PExportedFunctions ef , int pluginid);
-BOOL __stdcall CEPlugin_DisablePlugin(void);
+// BOOL __stdcall CEPlugin_GetVersion(PPluginVersion pv , int sizeofpluginversion);
+// BOOL __stdcall CEPlugin_InitializePlugin(PExportedFunctions ef , int pluginid);
+// BOOL __stdcall CEPlugin_DisablePlugin(void);
 //old versions without CEPlugin_ in front also work but are not recommended due to bugbrained compilers...
 
 

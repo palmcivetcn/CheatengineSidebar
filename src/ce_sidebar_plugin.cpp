@@ -2,7 +2,7 @@
 #include "cepluginsdk.h"
 
 // Plugin name/version metadata
-static const char* kPluginName = "CE Sidebar Dock v1.0.0";
+static const char* kPluginName = "CE Sidebar Dock v1.0.2";
 
 static PExportedFunctions g_exports = nullptr;
 static int g_pluginId = 0;
@@ -17,6 +17,7 @@ static int lua_set_topmost(lua_State* L);
 static const char* kSidebarLua = R"SIDEBAR(
 -- CE 自定义侧边栏（隐藏默认列表 + 精简标题 + 顶层窗口）
 local windowCache = {}
+local customNames = {} -- handle-string => custom title
 local lastSnapshot = {}
 
 -- 创建侧边栏
@@ -28,6 +29,15 @@ dockForm.BorderStyle = "bsSingle"
 
 local listBox = createListBox(dockForm)
 listBox.Align = "alClient"
+
+local popup = createPopupMenu(dockForm)
+local miRename = createMenuItem(popup)
+miRename.Caption = "重命名"
+popup.Items.add(miRename)
+local miClose = createMenuItem(popup)
+miClose.Caption = "关闭窗口"
+popup.Items.add(miClose)
+listBox.PopupMenu = popup
 
 -- 查找主 CE 窗口
 local function findMainCE()
@@ -66,6 +76,14 @@ local xOffset = -dockForm.Width - 6
 local yOffset = 0
 local lastLeft,lastTop = 0,0
 
+local function keyOf(f)
+    return tostring(f.Handle)
+end
+
+local function alive(obj)
+    return obj and (obj.destroyed==nil or obj.destroyed==false)
+end
+
 local function reposition()
     if mainCE then
         dockForm.Left = mainCE.Left + xOffset
@@ -98,17 +116,53 @@ local function hasChanged(old,new)
     return false
 end
 
+local function selectedEntry()
+    if not alive(listBox) then return nil end
+    local idx = listBox.ItemIndex + 1
+    return windowCache[idx]
+end
+
+local function doRename()
+    local entry = selectedEntry()
+    if not entry then return end
+    local current = customNames[entry.key] or entry.name
+    local ok,newName = pcall(function() return inputQuery("重命名","新的显示名称：", current) end)
+    if ok and newName and newName~="" then
+        customNames[entry.key] = newName
+        refreshList()
+    end
+end
+
+local function doClose()
+    local entry = selectedEntry()
+    if not entry or not alive(entry.handle) then return end
+    pcall(function() entry.handle.close() end)
+end
+
+miRename.OnClick = doRename
+miClose.OnClick = doClose
+
 local function refreshList()
+    if not alive(listBox) then return end
     listBox.Items.Clear()
     windowCache = {}
+    local activeHandles = {}
 
     for i=0, getFormCount()-1 do
         local f = getForm(i)
         if f and f.Visible and f.Width>0 and f.Height>0 then
             local name = (f.Caption~="" and f.Caption) or f.ClassName
-            table.insert(windowCache, {handle=f, name=name})
-            -- 使用简化标题
-            listBox.Items[listBox.Items.Count] = shortTitle(name)
+            local key = keyOf(f)
+            local disp = customNames[key] or name
+            table.insert(windowCache, {handle=f, name=name, key=key})
+            listBox.Items[listBox.Items.Count] = shortTitle(disp)
+            activeHandles[key] = true
+        end
+    end
+
+    for k,_ in pairs(customNames) do
+        if not activeHandles[k] then
+            customNames[k] = nil
         end
     end
 
@@ -117,9 +171,12 @@ end
 
 -- 用 OnMouseUp 触发切换
 listBox.OnMouseUp = function(sender, button, shift, x, y)
+    if not alive(listBox) then return end
     local idx = listBox.ItemIndex + 1
-    if windowCache[idx] then
-        windowCache[idx].handle:SetFocus()
+    if button==0 then -- left click
+        if windowCache[idx] then
+            windowCache[idx].handle:SetFocus()
+        end
     end
 end
 
@@ -137,9 +194,14 @@ refreshList()
 reposition()
 
 -- 周期检测
-local checker = createTimer(nil, false)
+local checker = nil
+checker = createTimer(nil, false)
 checker.Interval = 200
 checker.OnTimer = function()
+    if not alive(dockForm) then
+        checker.Enabled = false
+        return
+    end
     mainCE = findMainCE()
     if mainCE and (mainCE.Left~=lastLeft or mainCE.Top~=lastTop) then
         reposition()
@@ -149,6 +211,13 @@ checker.OnTimer = function()
     if hasChanged(lastSnapshot, snap2) then
         refreshList()
     end
+end
+
+dockForm.OnClose = function(sender)
+    if checker then checker.Enabled = false end
+    listBox = nil
+    dockForm = nil
+    customNames = {}
 end
 checker.Enabled = true
 
