@@ -1,6 +1,8 @@
 # CE Sidebar Dock (Cheat Engine 7.6 plugin)
 
 一个把你现有的 Lua 侧边栏脚本包装成真正 Windows 顶层窗口的 CE 插件（v1.0.0）。
+## 实机演示
+
 
 ## 功能
 - 自动隐藏默认的“CE 窗口列表”菜单项，使用精简标题显示 CE 侧边窗口。
