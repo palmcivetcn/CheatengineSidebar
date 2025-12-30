@@ -1,3 +1,4 @@
+🇨🇳 [中文](https://github.com/palmcivetcn/CheatengineSidebar/blob/main/README.md) | 🇺🇸 [English](https://github.com/palmcivetcn/CheatengineSidebar/blob/main/README_EN.md)
 # CE Sidebar Dock (Cheat Engine 7.6 plugin)
 
 A CE plugin that shows every CE form in a sidebar and lets you click to switch between them. The sidebar is promoted to a normal Windows top-level window so it behaves like an independent window for easy toggling.
